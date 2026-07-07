@@ -1,0 +1,228 @@
+GitHub SSH Setup & Authentication Notes (Mac)
+
+These are the mistakes I made and how to fix them in the future.
+
+Problem 1: Git asked for Username and Password
+Command
+git push -u origin main
+Error
+Username for 'https://github.com':
+Password for 'https://github.com':
+remote: Invalid username or token.
+Password authentication is not supported for Git operations.
+Why it happened
+
+My Git remote was using HTTPS.
+
+GitHub no longer accepts account passwords for Git operations over HTTPS.
+
+Fix
+
+Either:
+
+Use a Personal Access Token (PAT) instead of a password, or
+Switch to SSH (recommended).
+Problem 2: Check which remote Git is using
+Command
+git remote -v
+HTTPS example
+origin https://github.com/palla023/DSA-JS.git
+SSH example
+origin git@github.com:palla023/DSA-JS.git
+Fix
+
+If it's HTTPS, change it to SSH.
+
+git remote set-url origin git@github.com:palla023/DSA-JS.git
+
+Verify:
+
+git remote -v
+Problem 3: SSH Authentication Failed
+Command
+ssh -T git@github.com
+Error
+Permission denied (publickey).
+Why it happened
+
+GitHub couldn't find my SSH public key.
+
+This usually means:
+
+No SSH key exists.
+The SSH key wasn't added to GitHub.
+The SSH agent isn't using the key.
+Problem 4: Check whether an SSH key exists
+Command
+ls -la ~/.ssh
+Good output
+id_ed25519
+id_ed25519.pub
+
+If these files exist, I already have an SSH key.
+
+Problem 5: Generate a new SSH key (only if needed)
+
+If id_ed25519 doesn't exist:
+
+ssh-keygen -t ed25519 -C "your-email@example.com"
+
+Press Enter for every prompt to accept the default location.
+
+Problem 6: Start the SSH agent
+eval "$(ssh-agent -s)"
+Problem 7: Add the key to the SSH agent
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+
+If this command fails because the file doesn't exist, generate the key first.
+
+Problem 8: Copy the public key
+
+View it:
+
+cat ~/.ssh/id_ed25519.pub
+
+Or copy it directly to the clipboard:
+
+pbcopy < ~/.ssh/id_ed25519.pub
+Problem 9: Add the key to GitHub
+Log in to GitHub.
+Click your profile picture → Settings.
+Open SSH and GPG keys.
+Click New SSH key.
+Title: My MacBook
+Paste the public key.
+Save.
+Problem 10: Test the SSH connection
+ssh -T git@github.com
+
+Expected output:
+
+Hi palla023! You've successfully authenticated, but GitHub does not provide shell access.
+
+If you still see:
+
+Permission denied (publickey)
+
+Run:
+
+ssh -vT git@github.com
+
+The verbose output shows which key your Mac is offering to GitHub.
+
+Problem 11: Push the repository
+git push -u origin main
+
+This should push successfully.
+
+Problem 12: Git keeps asking for credentials
+
+Remove the old GitHub credentials stored in macOS.
+
+Open:
+
+Keychain Access
+
+Search:
+
+github.com
+
+Delete the old GitHub Internet Password.
+
+Or erase the cached credential:
+
+git credential-osxkeychain erase
+
+Then enter:
+
+host=github.com
+protocol=https
+
+Press Enter twice.
+
+Useful Git Commands
+Show global configuration
+git config --global --list
+Show username
+git config --global user.name
+Show email
+git config --global user.email
+Set username
+git config --global user.name "Your Name"
+Set email
+git config --global user.email "your-email@example.com"
+Show remote
+git remote -v
+Change remote to SSH
+git remote set-url origin git@github.com:<username>/<repo>.git
+
+Example:
+
+git remote set-url origin git@github.com:palla023/DSA-JS.git
+Check SSH keys
+ls -la ~/.ssh
+Generate SSH key
+ssh-keygen -t ed25519 -C "your-email@example.com"
+Start SSH agent
+eval "$(ssh-agent -s)"
+Add SSH key
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+View public key
+cat ~/.ssh/id_ed25519.pub
+Copy public key
+pbcopy < ~/.ssh/id_ed25519.pub
+Test GitHub SSH
+ssh -T git@github.com
+Quick Troubleshooting Flow
+git push failed
+        │
+        ▼
+git remote -v
+        │
+        ├── HTTPS?
+        │      │
+        │      ▼
+        │  Change to SSH
+        │
+        ▼
+ssh -T git@github.com
+        │
+        ├── Success?
+        │      │
+        │      ▼
+        │  git push
+        │
+        └── Permission denied
+               │
+               ▼
+ls -la ~/.ssh
+               │
+        ├── No key?
+        │      │
+        │      ▼
+        │  Generate key
+        │
+        └── Key exists
+               │
+               ▼
+ssh-add ~/.ssh/id_ed25519
+               │
+               ▼
+Copy public key
+               │
+               ▼
+Add it to GitHub
+               │
+               ▼
+ssh -T git@github.com
+               │
+               ▼
+git push
+
+Lessons to Remember
+Never use your GitHub account password for git push over HTTPS. Use a Personal Access Token or, preferably, SSH.
+Check git remote -v first to see whether you're using HTTPS or SSH.
+If ssh -T git@github.com returns Permission denied (publickey), the problem is almost always with your SSH key setup.
+Your private key (id_ed25519) stays on your Mac. Only the public key (id_ed25519.pub) is added to GitHub.
+Test your SSH connection with ssh -T git@github.com before trying to push.
+When you get stuck, work through the troubleshooting flow from top to bottom instead of changing multiple things at once. This makes it much easier to identify the actual problem.
