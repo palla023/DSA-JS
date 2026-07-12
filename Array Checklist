@@ -1,0 +1,25 @@
+/**
+ * 🧠 Array Problem Solving Checklist
+ *
+ * 1. What should happen for EVERY element?
+ *    - Search?
+ *    - Compare?
+ *    - Count?
+ *    - Update?
+ *
+ * 2. What should happen when the condition is TRUE?
+ *    - Count?        -> count++
+ *    - Store value?  -> result.push(...)
+ *    - Update max?   -> max = arr[i]
+ *    - Return?       -> return i
+ *
+ * 3. When should I stop?
+ *    - Immediately after finding the answer? -> return
+ *    - After checking the entire array?      -> after the loop
+ *
+ * 4. What should happen if nothing is found?
+ *    - return -1
+ *    - return []
+ *    - return false
+ *    - return 0
+ */
