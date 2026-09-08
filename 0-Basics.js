@@ -6,6 +6,7 @@ const b = 20;
 const sum = a + b;
 console.log(sum);
 
+//Space between the numbers and the string will result in string addition
 let firstName = "Raj";
 let lastName = "S";
 let fullName = firstName + " " + lastName;

@@ -24,6 +24,16 @@ function greet(i){
     console.log("Namasthe "+ i);
     
 }
+/**.  
+ * 
+ * greet(0)
+ * greet(1)
+ * greet(2)
+ * Here the greet function is called 3 times with the values 0 to 2.
+ * So this is the repeatation of the greet function 6 times.
+ * So , we have to think : whenever a repeatation of a task is required , we use a loop.
+*/
+
 for(let i=0;i<=5;i++){
     greet(i);
 }
